@@ -2,12 +2,12 @@ const fs = require("fs");
 const path = require("path");
 
 // Function to recursively gather files and generate HTML
-async function generateHTML(rootDir, outputHtmlPath) {
+async function generateCSV(rootDir, outputCsvPath) {
   const fileTree = await gatherFiles(rootDir);
 
-  const html = generateHTMLFromFiles(fileTree, rootDir);
-  fs.writeFileSync(outputHtmlPath, html);
-  console.log(`HTML file generated at ${outputHtmlPath}`);
+  const csv = generateCsvFromFiles(fileTree, rootDir);
+  fs.writeFileSync(outputCsvPath, csv);
+  console.log(`CSV file generated at ${outputCsvPath}`);
 }
 
 // Function to gather files recursively
@@ -30,17 +30,16 @@ async function gatherFiles(dir) {
   return files;
 }
 
-// Function to generate HTML from the file tree
-function generateHTMLFromFiles(fileTree, rootDir) {
-  let html = "<html><body style='font-size:6pt;'>";
+function generateCsvFromFiles(fileTree, rootDir) {
+  let csv = "";
 
   function processFiles(files, currentPath) {
     for (const item of files) {
       if (item.directory) {
-        html += `<h1>${currentPath}/${item.directory}</h1>`;
-        html += "<div style='display: flex; flex-wrap:wrap;'>";
+        // html += `<h1>${currentPath}/${item.directory}</h1>`;
+        // html += "<div style='display: flex; flex-wrap:wrap;'>";
         processFiles(item.files, `${currentPath}/${item.directory}`);
-        html += "</div>";
+        // html += "</div>";
       } else {
         // Check if the file is an image (you can customize the file extensions)
         const imageExtensions = [
@@ -54,12 +53,10 @@ function generateHTMLFromFiles(fileTree, rootDir) {
         const ext = path.extname(item.file).toLowerCase();
 
         if (imageExtensions.includes(ext)) {
-          const imagePath = path.join(rootDir, currentPath, item.file);
-
-          html += `<div style="margin-bottom: 3em; margin-right: 1em;">`;
-          html += `<p>${item.file}</p>`;
-          html += `<img src="${imagePath}" alt="${item.file}" width="100" />`;
-          html += `</div>`;
+          const imagePath = path.join(currentPath, item.file);
+          csv += `${currentPath}\t`;
+          csv += `${item.file}\t`;
+          csv += `${imagePath}\n`;
         }
       }
     }
@@ -67,9 +64,7 @@ function generateHTMLFromFiles(fileTree, rootDir) {
 
   processFiles(fileTree, "");
 
-  html += "</body></html>";
-  return html;
+  return csv;
 }
 
-// Usage: Call generateHTML with your root directory and output HTML path
-generateHTML("./thumbnails", "output.html");
+generateCSV("./thumbnails", "output.csv");
