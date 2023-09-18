@@ -1,0 +1,4 @@
+files/*
+thumbnails/*
+node_modules/*
+.DS_Store
